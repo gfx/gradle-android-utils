@@ -1,0 +1,37 @@
+apply from: '../build.gradle'
+
+
+
+task check << {}
+
+check.dependsOn(task("initSdkDir") << {
+    def localPropFile = file("local.properties")
+    localPropFile.deleteOnExit()
+    localPropFile.delete()
+    initSdkDir()
+    assert localPropFile.exists()
+})
+
+check.dependsOn(task("writeResources") << {
+    def resFile = file("test.xml")
+    resFile.deleteOnExit()
+    resFile.delete()
+    writeResources(resFile, [foo: "aaa", bar: "bbb"])
+    assert resFile.exists()
+    def records = new XmlParser().parse(resFile)
+    assert records.name() == "resources"
+    assert records.children().size() == 2
+})
+
+check.dependsOn(task("readVersion") << {
+    def versionFile = file("VERSION")
+    versionFile.deleteOnExit()
+    versionFile.write("1.2.30")
+    def v = readVersion(versionFile)
+    assert v.major == 1
+    assert v.minor == 2
+    assert v.patchLevel == 30
+    assert v.toVersionName() == "1.2.30"
+    assert v.toVersionCode() == 1002030
+})
+

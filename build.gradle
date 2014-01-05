@@ -1,0 +1,82 @@
+ext.writeProperties = { propertiesFile, dict ->
+    def s = ""
+    dict.each { key, value ->
+        s += "$key=$value\n"
+    }
+    logger.info("writing $propertiesFile")
+    propertiesFile.write(s)
+}
+
+ext.initSdkDir = {
+    def localPropFile = file("local.properties")
+
+    if (!localPropFile.exists()) {
+        [
+            System.getenv("ANDROID_HOME"),
+            System.getenv("ANDROID_SDK"),
+            "/usr/local/opt/android-sdk",
+            "/Applications/Android Studio/sdk"
+        ].each { dir ->
+            if (dir != null && file(dir).exists()) {
+                writeProperties(localPropFile, ["sdk.dir": dir])
+                return;
+            }
+        }
+
+        if (!localPropFile.exists()) {
+            throw new RuntimeException("No Android SDK found.")
+        }
+    }
+}
+
+// e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
+ext.writeResources = { file, dict ->
+    def s = ""
+    s += """<?xml version="1.0" encoding="utf-8"?>\n<resources>\n"""
+    dict.each { key, value ->
+        s += """<string name="$key">$value</string>\n"""
+    }
+    s += """</resources>\n"""
+
+    logger.info("writing $file")
+    file.write(s)
+}
+
+public class Version {
+    public final int major;
+    public final int minor;
+    public final int patchLevel;
+
+    public final String source;
+
+    public Version(String v) {
+        source = v
+
+        def parts = v.split("\\.", 3)
+        major = Integer.valueOf(parts[0])
+        minor = Integer.valueOf(parts[1])
+        patchLevel = Integer.valueOf(parts[2])
+    }
+
+    @Override
+    public String toString() {
+        return Sring.format("%s (%s)", toVesionName(), toVersionCode())
+    }
+
+    public String toVersionName() {
+        return source
+    }
+
+    public int toVersionCode() {
+        return major * (1000 * 1000) + minor * 1000 + patchLevel;
+    }
+}
+
+ext.parseVersion = { String versionString ->
+    return new Version(versionString)
+}
+
+ext.readVersion = { file ->
+    def s = new String(file.readBytes())
+    return parseVersion(s)
+}
