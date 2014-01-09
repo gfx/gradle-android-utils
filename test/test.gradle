@@ -31,5 +31,6 @@ check.dependsOn(task("readVersion") << {
     assert v.patchLevel == 30
     assert v.toVersionName() == "1.2.30"
     assert v.toVersionCode() == 1002030
+    assert v.toString() == "1.2.30 (1002030)"
 })
 

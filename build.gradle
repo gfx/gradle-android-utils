@@ -60,7 +60,7 @@ public class Version {
 
     @Override
     public String toString() {
-        return Sring.format("%s (%s)", toVesionName(), toVersionCode())
+        return String.format("%s (%s)", toVersionName(), toVersionCode())
     }
 
     public String toVersionName() {
