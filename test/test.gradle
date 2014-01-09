@@ -2,18 +2,27 @@ apply from: '../build.gradle'
 
 task check
 
+private def tempFile(String name) {
+    def f = file(name)
+    f.deleteOnExit()
+    return f
+}
+
+check.dependsOn(task("iconToGrayScale") << {
+    def inputFile = file("data/ic_launcher.png")
+    def outputFile = tempFile("gray.png")
+    iconToGrayScale(inputFile, outputFile)
+    assert outputFile.exists()
+})
+
 check.dependsOn(task("initSdkDir") << {
-    def localPropFile = file("local.properties")
-    localPropFile.deleteOnExit()
-    localPropFile.delete()
+    def localPropFile = tempFile("local.properties")
     initSdkDir()
     assert localPropFile.exists()
 })
 
 check.dependsOn(task("writeResources") << {
-    def resFile = file("test.xml")
-    resFile.deleteOnExit()
-    resFile.delete()
+    def resFile = tempFile("test.xml")
     writeResources(resFile, [foo: "aaa", bar: "bbb"])
     assert resFile.exists()
     def records = new XmlParser().parse(resFile)
@@ -22,8 +31,7 @@ check.dependsOn(task("writeResources") << {
 })
 
 check.dependsOn(task("readVersion") << {
-    def versionFile = file("VERSION")
-    versionFile.deleteOnExit()
+    def versionFile = tempFile("VERSION")
     versionFile.write("1.2.30")
     def v = readVersion(versionFile)
     assert v.major == 1

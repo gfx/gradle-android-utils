@@ -1,3 +1,29 @@
+import java.awt.image.BufferedImage
+import java.awt.Color
+import javax.imageio.ImageIO
+
+private int toGray(color) {
+    def a = (color & 0xFF000000)
+    def r = (color & 0x00FF0000) >> 16
+    def g = (color & 0x0000FF00) >>  8
+    def b = (color & 0x000000FF)
+
+    def c = (int)((2.0*r + 4.0*g + b) / 7.0) //
+    return a | (c << 16) | (c << 8) | c
+}
+
+ext.iconToGrayScale = { File inputFile, File outputFile ->
+    def img = ImageIO.read(inputFile)
+    for (int y = 0; y < img.getHeight(); y++) {
+        for (int x = 0; x < img.getWidth(); x++) {
+            def color = img.getRGB(x, y)
+            img.setRGB(x, y, toGray(color))
+        }
+    }
+
+    ImageIO.write(img, "png", outputFile)
+}
+
 ext.writeProperties = { propertiesFile, dict ->
     def s = ""
     dict.each { key, value ->
