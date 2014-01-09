@@ -24,7 +24,7 @@ ext.iconToGrayScale = { File inputFile, File outputFile ->
     ImageIO.write(img, "png", outputFile)
 }
 
-ext.writeProperties = { propertiesFile, dict ->
+ext.writeProperties = { File propertiesFile, Map<String, String> dict ->
     def s = ""
     dict.each { key, value ->
         s += "$key=$value\n"
@@ -56,7 +56,7 @@ ext.initSdkDir = {
 }
 
 // e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
-ext.writeResources = { file, dict ->
+ext.writeResources = { File file, Map<String, String> dict ->
     def s = ""
     s += """<?xml version="1.0" encoding="utf-8"?>\n<resources>\n"""
     dict.each { key, value ->
@@ -102,7 +102,7 @@ ext.parseVersion = { String versionString ->
     return new Version(versionString)
 }
 
-ext.readVersion = { file ->
+ext.readVersion = { File file ->
     def s = new String(file.readBytes())
     return parseVersion(s)
 }
