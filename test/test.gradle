@@ -1,8 +1,6 @@
 apply from: '../build.gradle'
 
-
-
-task check << {}
+task check
 
 check.dependsOn(task("initSdkDir") << {
     def localPropFile = file("local.properties")
