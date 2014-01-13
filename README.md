@@ -4,22 +4,22 @@ This is a set of utilities for Android build system.
 
 # METHODS
 
-## `void iconToGrayScale(File inputFile, File outputFile)`
+### `void iconToGrayScale(File inputFile, File outputFile)`
 
 Converts the input icon file into grayscaled one.
 
-## `void initSdkDir()`
+### `void initSdkDir()`
 
 Creates `local.properties` with `sdk.dir` if it does not exist
 
-## `void writeResources(File file, Map<String, String> dict)`
+### `void writeResources(File file, Map<String, String> dict)`
 
 Creates a resource XML file, which contains `dict`.
 
-## `Version parseVersion(String versionName)`, `Version readVersion(File versionFile)`
+### `Version parseVersion(String versionName)`, `Version readVersion(File versionFile)`
 
 Prases or reads a version object, which has `toVersionCode()` and `toVersionName()` methods.
 
 # SEE ALSO
 
-* https://github.com/gfx/Android-HankeiN
+* https://github.com/gfx/Android-HankeiN which uses this project
