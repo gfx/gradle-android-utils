@@ -21,7 +21,15 @@ ext.iconToGrayScale = { File inputFile, File outputFile ->
         }
     }
 
+    outputFile.getParentFile().mkdirs()
     ImageIO.write(img, "png", outputFile)
+}
+
+ext.makeGrayscaleLauncherIcon = { String name ->
+    fileTree(dir: 'src/main/res', include: "drawable*/$name").each { File ic ->
+        def outputFile = file(ic.getPath().replaceAll("/main/", "/debug/"))
+        iconToGrayScale(ic, outputFile)
+    }
 }
 
 ext.writeProperties = { File propertiesFile, Map<String, String> dict ->
