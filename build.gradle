@@ -106,3 +106,35 @@ ext.readVersion = { File file ->
     def s = new String(file.readBytes())
     return parseVersion(s)
 }
+
+
+
+public class Package {
+    public final String basename;
+
+    public Package(String name) {
+        basename = name
+    }
+
+    public String getSimpleName(String namespace) {
+        return basename + namespace;
+    }
+
+    public String getSimpleName(String namespace, String basename) {
+        return basename + namespace
+    }
+
+    public boolean isBasenameEmpty() {
+        return basename == '';
+    }
+
+    @Override
+    public String toString() {
+        return basename;
+    }
+}
+
+ext.newPackage = { String basename ->
+    return new Package(basename)
+}
+
