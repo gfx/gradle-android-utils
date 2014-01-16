@@ -20,6 +20,10 @@ Creates a resource XML file, which contains `dict`.
 
 Prases or reads a version object, which has `toVersionCode()` and `toVersionName()` methods.
 
+### `Package newPackage(String basename)`
+
+Package name builder, which has `getSimpleName(String namespace)` and `getSimpleName(String namespace, basename)` methods.
+
 # SEE ALSO
 
 * https://github.com/gfx/Android-HankeiN which uses this project

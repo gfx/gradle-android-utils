@@ -42,3 +42,13 @@ check.dependsOn(task("readVersion") << {
     assert v.toString() == "1.2.30 (1002030)"
 })
 
+check.dependsOn(task("newPackage") <<{
+    def basename = "com.example"
+    def namespace = ".app.mypackage"
+    def anotherBasename = "net.sample"
+    def app = newPackage(basename)
+    assert app.basename == basename
+    assert app.getSimpleName(namespace) == basename + namespace
+    assert app.getSimpleName(namespace, anotherBasename) == anotherBasename + namespace
+})
+
