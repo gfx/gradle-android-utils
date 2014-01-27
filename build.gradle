@@ -45,6 +45,9 @@ ext.initSdkDir = {
     def localPropFile = file("local.properties")
 
     if (!localPropFile.exists()) {
+        def dict = new HashMap<String, String>()
+
+        // sdk.dir is required
         [
             System.getenv("ANDROID_HOME"),
             System.getenv("ANDROID_SDK"),
@@ -52,14 +55,26 @@ ext.initSdkDir = {
             "/Applications/Android Studio/sdk"
         ].each { dir ->
             if (dir != null && file(dir).exists()) {
-                writeProperties(localPropFile, ["sdk.dir": dir])
+                dict["sdk.dir"] = dir
+                return;
+            }
+        }
+        if (dict["sdk.dir"] == null) {
+            throw new RuntimeException("No Android SDK found.")
+        }
+
+        // ndk.dir is optional
+        [
+            System.getenv("ANDROID_NDK"),
+            "/usr/local/opt/android-ndk",
+        ].each { dir ->
+            if (dir != null && file(dir).exists()) {
+                dict["ndk.dir"] = dir
                 return;
             }
         }
 
-        if (!localPropFile.exists()) {
-            throw new RuntimeException("No Android SDK found.")
-        }
+        writeProperties(localPropFile, dict)
     }
 }
 
