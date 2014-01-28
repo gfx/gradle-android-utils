@@ -23,3 +23,8 @@ Prases or reads a version object, which has `toVersionCode()` and `toVersionName
 # SEE ALSO
 
 * https://github.com/gfx/Android-HankeiN which uses this project
+
+# LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms of the MIT license.
+
