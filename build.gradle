@@ -79,11 +79,17 @@ ext.initSdkDir = {
 }
 
 // e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
-ext.writeResources = { File file, Map<String, String> dict ->
+ext.writeResources = { File file, Map<String, Object> dict ->
     def s = ""
     s += """<?xml version="1.0" encoding="utf-8"?>\n<resources>\n"""
     dict.each { key, value ->
-        s += """<string name="$key">$value</string>\n"""
+        if (value in Boolean) {
+            s += """<bool name="$key">$value</bool>\n"""
+        } else if (value in Integer) {
+            s += """<integer name="$key">$value</integer>\n"""
+        } else {
+            s += """<string name="$key">$value</string>\n"""
+        }
     }
     s += """</resources>\n"""
 

@@ -23,11 +23,23 @@ check.dependsOn(task("initSdkDir") << {
 
 check.dependsOn(task("writeResources") << {
     def resFile = tempFile("test.xml")
-    writeResources(resFile, [foo: "aaa", bar: "bbb"])
+    writeResources(resFile, [foo: "aaa", bar: true, baz: 123])
     assert resFile.exists()
     def records = new XmlParser().parse(resFile)
     assert records.name() == "resources"
-    assert records.children().size() == 2
+    assert records.children().size() == 3
+    def foo = records.children().get(0)
+    assert foo.name() == "string"
+    assert foo.@name == "foo"
+    assert foo.text() == "aaa"
+    def bar = records.children().get(1)
+    assert bar.name() == "bool"
+    assert bar.@name == "bar"
+    assert bar.text() == "true"
+    def baz = records.children().get(2)
+    assert baz.name() == "integer"
+    assert baz.@name == "baz"
+    assert baz.text() == "123"
 })
 
 check.dependsOn(task("readVersion") << {
