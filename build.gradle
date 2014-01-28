@@ -41,11 +41,14 @@ ext.writeProperties = { File propertiesFile, Map<String, String> dict ->
     propertiesFile.write(s)
 }
 
-ext.initSdkDir = {
+ext.initSdkDir = { Map<String, String> extra = null ->
     def localPropFile = file("local.properties")
 
     if (!localPropFile.exists()) {
         def dict = new HashMap<String, String>()
+        if (extra != null) {
+            dict.putAll(extra)
+        }
 
         // sdk.dir is required
         [

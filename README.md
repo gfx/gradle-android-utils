@@ -10,9 +10,10 @@ NOTE: **This project is still alpha-qality; API will be change without notice**
 
 Converts the input icon file into grayscaled one.
 
-### `void initSdkDir()`
+### `void initSdkDir(Map<String, String> extra = null)`
 
-Creates `local.properties` with `sdk.dir` if it does not exist
+Creates `local.properties` if it does not exist, which includes
+`sdk.dir`, `ndk.dir` and `extra` properties.
 
 ### `void writeResources(File file, Map<String, String> dict)`
 
