@@ -2,6 +2,8 @@
 
 This is a set of utilities for Android build system.
 
+NOTE: **This project is still alpha-qality; API will be change without notice**
+
 # METHODS
 
 ### `void iconToGrayScale(File inputFile, File outputFile)`
