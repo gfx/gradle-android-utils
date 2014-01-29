@@ -25,6 +25,9 @@ ext.iconToGrayScale = { File inputFile, File outputFile ->
     ImageIO.write(img, "png", outputFile)
 }
 
+/**
+ * Makes gray-scaled launcher icons for the "debug" build variant.
+ */
 ext.makeGrayscaleLauncherIcon = { File dir, String name ->
     fileTree(dir: dir, include: "res/drawable*/$name").each { File ic ->
         def outputFile = file(ic.getPath().replaceAll("/main/", "/debug/"))
@@ -41,11 +44,17 @@ ext.writeProperties = { File propertiesFile, Map<String, String> dict ->
     propertiesFile.write(s)
 }
 
-ext.initSdkDir = {
+/**
+ * Initialize local.properties which includes sdk.dir, ndk.dir and extra properties.
+ */
+ext.initSdkDir = { Map<String, String> extra = null ->
     def localPropFile = file("local.properties")
 
     if (!localPropFile.exists()) {
         def dict = new HashMap<String, String>()
+        if (extra != null) {
+            dict.putAll(extra)
+        }
 
         // sdk.dir is required
         [
@@ -78,8 +87,11 @@ ext.initSdkDir = {
     }
 }
 
-// e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
-ext.writeResources = { File file, Map<String, Object> dict ->
+/**
+ * Writes Android resources.
+ * e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
+ */
+ext.writeResources = { File file, Map<String, String> dict ->
     def s = ""
     s += """<?xml version="1.0" encoding="utf-8"?>\n<resources>\n"""
     dict.each { key, value ->
@@ -97,6 +109,9 @@ ext.writeResources = { File file, Map<String, Object> dict ->
     file.write(s)
 }
 
+/**
+ * Representation of Semantic Version (major.minor.patchlevel)
+ */
 public class Version {
     public final int major;
     public final int minor;
