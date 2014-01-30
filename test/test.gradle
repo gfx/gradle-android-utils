@@ -42,3 +42,7 @@ check.dependsOn(task("readVersion") << {
     assert v.toString() == "1.2.30 (1002030)"
 })
 
+check.dependsOn(task("generateViewHolders") << {
+    generateViewHolders(fileTree(dir: "data", include: "res/layout/*.xml"))
+})
+

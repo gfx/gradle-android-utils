@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.sun.codemodel:codemodel:2.6'
+    }
+}
+
 import java.awt.image.BufferedImage
 import java.awt.Color
 import javax.imageio.ImageIO
+import com.sun.codemodel.JCodeModel
+import com.sun.codemodel.JMod
 
 private int toGray(color) {
     def a = (color & 0xFF000000)
@@ -143,4 +154,47 @@ ext.parseVersion = { String versionString ->
 ext.readVersion = { File file ->
     def s = new String(file.readBytes())
     return parseVersion(s)
+}
+
+String camerize(String snakeCased) {
+    def first = snakeCased.substring(0, 1)
+    def rest  = snakeCased.substring(1)
+    return first.toUpperCase() + rest.toLowerCase()
+}
+
+ext.generateViewHolders = { xmlFiles ->
+    // TODO: get project package name
+    def pkg = "com.example"
+    xmlFiles.each { File layoutXml ->
+        def simpleName = layoutXml.getName().split('\\.')[0]
+        def className = simpleName.split('_').collect { String part ->
+            camerize(part)
+        }.join('')
+        println("Generating ${className}.java from $layoutXml")
+
+        def model = new JCodeModel()
+        def vhClass = model._class(pkg + ".viewholder.$className")
+
+        def androidNs = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+        def xmlParser = new XmlParser()
+        def layout = xmlParser.parse(layoutXml)
+        def walk;
+        walk = { element ->
+            def widgetId = element.attribute(androidNs.get("id"))
+            if (widgetId != null) {
+                def parts = widgetId.split('/')
+                if (parts[0] == "@+id") {
+                    vhClass.field(JMod.PUBLIC, model.ref("android.widget.${element.name()}"), parts[1])
+                }
+            }
+
+            element.children().each { walk(it) }
+        }
+
+        walk(layout)
+
+        def javaSourceDir = file(".gen/java")
+        javaSourceDir.mkdirs()
+        model.build(javaSourceDir)
+    }
 }
