@@ -13,7 +13,7 @@ private int toGray(color) {
 }
 
 ext.iconToGrayScale = { File inputFile, File outputFile ->
-    if (outputFile.exists()) {
+    if (outputFile.exists() && outputFile.lastModified() >= inputFile.lastModified()) {
         return;
     }
 
