@@ -1,5 +1,3 @@
-import java.awt.image.BufferedImage
-import java.awt.Color
 import javax.imageio.ImageIO
 
 private int toGray(color) {
@@ -95,7 +93,7 @@ ext.initSdkDir = { Map<String, String> extra = null ->
  * Writes Android resources.
  * e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
  */
-ext.writeResources = { File file, Map<String, String> dict ->
+ext.writeResources = { File file, Map<String, Object> dict ->
     def s = ""
     s += """<?xml version="1.0" encoding="utf-8"?>\n<resources>\n"""
     dict.each { key, value ->
