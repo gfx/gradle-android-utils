@@ -20,6 +20,36 @@ Creates a resource XML file, which contains `dict`.
 
 Prases or reads a version object, which has `toVersionCode()` and `toVersionName()` methods.
 
+## `void setBuildConfigField(buildType, Map<String, Object> buildConfigMap)`
+
+Set `buildConfigField` from `Map`. Requirements to 'com.android.tools.build:gradle:0.8.0' or later.
+
+``` groovy
+// For example
+
+android.applicationVariants.all { variant ->
+    def buildConfigMap = [
+        'APP_NAME': 'MyApp' + variant.buildType.name.capitalize(),
+        'EXTENSION_MIN_SDK_INT': 14,
+        'API_SERVER_PRODUCTION': false,
+    ]
+
+    setBuildConfigField(variant.buildType, buildConfigMap)
+}
+
+/**
+ * //Build result
+ *
+ * public final class BuildConfig {
+ *   ...
+ *   // Fields from build type: debug
+ *   public static final String APP_NAME = "MyAppDebug";
+ *   public static final Integer EXTENSION_MIN_SDK_INT = 14;
+ *   public static final Boolean API_SERVER_PRODUCTION = false;
+ * }
+ */
+```
+
 # SEE ALSO
 
 * https://github.com/gfx/Android-HankeiN
