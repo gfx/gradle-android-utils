@@ -112,7 +112,7 @@ ext.writeResources = { File file, Map<String, Object> dict ->
 }
 
 /**
- * Representation of Semantic Version (major.minor.patchlevel)
+ * Representation of Semantic Version (major.minor.patch-level)
  */
 public class Version {
     public final int major;
