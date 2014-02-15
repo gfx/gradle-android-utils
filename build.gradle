@@ -13,6 +13,10 @@ private int toGray(color) {
 }
 
 ext.iconToGrayScale = { File inputFile, File outputFile ->
+    if (outputFile.exists() && outputFile.lastModified() >= inputFile.lastModified()) {
+        return;
+    }
+
     def img = ImageIO.read(inputFile)
     for (int y = 0; y < img.getHeight(); y++) {
         for (int x = 0; x < img.getWidth(); x++) {
@@ -21,7 +25,18 @@ ext.iconToGrayScale = { File inputFile, File outputFile ->
         }
     }
 
+    outputFile.getParentFile().mkdirs()
     ImageIO.write(img, "png", outputFile)
+}
+
+/**
+ * Makes gray-scaled launcher icons for the "debug" build variant.
+ */
+ext.makeGrayscaleLauncherIcon = { File dir, String name ->
+    fileTree(dir: dir, include: "res/drawable*/$name").each { File ic ->
+        def outputFile = file(ic.getPath().replaceAll("/main/", "/debug/"))
+        iconToGrayScale(ic, outputFile)
+    }
 }
 
 ext.writeProperties = { File propertiesFile, Map<String, String> dict ->
@@ -33,10 +48,19 @@ ext.writeProperties = { File propertiesFile, Map<String, String> dict ->
     propertiesFile.write(s)
 }
 
-ext.initSdkDir = {
+/**
+ * Initialize local.properties which includes sdk.dir, ndk.dir and extra properties.
+ */
+ext.initSdkDir = { Map<String, String> extra = null ->
     def localPropFile = file("local.properties")
 
     if (!localPropFile.exists()) {
+        def dict = new HashMap<String, String>()
+        if (extra != null) {
+            dict.putAll(extra)
+        }
+
+        // sdk.dir is required
         [
             System.getenv("ANDROID_HOME"),
             System.getenv("ANDROID_SDK"),
@@ -44,23 +68,44 @@ ext.initSdkDir = {
             "/Applications/Android Studio/sdk"
         ].each { dir ->
             if (dir != null && file(dir).exists()) {
-                writeProperties(localPropFile, ["sdk.dir": dir])
+                dict["sdk.dir"] = dir
+                return;
+            }
+        }
+        if (dict["sdk.dir"] == null) {
+            throw new RuntimeException("No Android SDK found.")
+        }
+
+        // ndk.dir is optional
+        [
+            System.getenv("ANDROID_NDK"),
+            "/usr/local/opt/android-ndk",
+        ].each { dir ->
+            if (dir != null && file(dir).exists()) {
+                dict["ndk.dir"] = dir
                 return;
             }
         }
 
-        if (!localPropFile.exists()) {
-            throw new RuntimeException("No Android SDK found.")
-        }
+        writeProperties(localPropFile, dict)
     }
 }
 
-// e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
+/**
+ * Writes Android resources.
+ * e.g. writeResources(file("src/main/res/values/_generated.xml"), ["foo" : "bar"])
+ */
 ext.writeResources = { File file, Map<String, String> dict ->
     def s = ""
     s += """<?xml version="1.0" encoding="utf-8"?>\n<resources>\n"""
     dict.each { key, value ->
-        s += """<string name="$key">$value</string>\n"""
+        if (value in Boolean) {
+            s += """<bool name="$key">$value</bool>\n"""
+        } else if (value in Integer) {
+            s += """<integer name="$key">$value</integer>\n"""
+        } else {
+            s += """<string name="$key">$value</string>\n"""
+        }
     }
     s += """</resources>\n"""
 
@@ -68,6 +113,9 @@ ext.writeResources = { File file, Map<String, String> dict ->
     file.write(s)
 }
 
+/**
+ * Representation of Semantic Version (major.minor.patchlevel)
+ */
 public class Version {
     public final int major;
     public final int minor;
@@ -76,9 +124,9 @@ public class Version {
     public final String source;
 
     public Version(String v) {
-        source = v
+        source = v.trim()
 
-        def parts = v.split("\\.", 3)
+        def parts = source.split("\\.", 3)
         major = Integer.valueOf(parts[0])
         minor = Integer.valueOf(parts[1])
         patchLevel = Integer.valueOf(parts[2])
