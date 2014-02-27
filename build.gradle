@@ -111,6 +111,16 @@ ext.writeResources = { File file, Map<String, Object> dict ->
     file.write(s)
 }
 
+ext.makeDummyFile = { File inputFile, File outputFile ->
+    if (!inputFile.exists()) {
+        throw new FileNotFoundException("Template file does not exist: ${inputFile.getAbsolutePath()}")
+    }
+    outputFile.getParentFile().mkdirs()
+    if (!outputFile.exists()) {
+        outputFile << inputFile.readBytes()
+    }
+}
+
 /**
  * Representation of Semantic Version (major.minor.patch-level)
  */

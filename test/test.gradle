@@ -21,6 +21,41 @@ check.dependsOn(task("initSdkDir") << {
     assert localPropFile.exists()
 })
 
+check.dependsOn(task("makeDummyFile") << {
+    def doesMakeDummyFile = {
+        def dummyTemplate = file('data/template.example')
+        def dummyOutFile = file('data/template')
+        makeDummyFile(dummyTemplate, dummyOutFile)
+        def isComplete = dummyOutFile.exists() && dummyTemplate.readBytes() == dummyOutFile.readBytes()
+        dummyOutFile.delete()
+        return isComplete
+    }()
+    assert doesMakeDummyFile
+
+    def doesMakeDummyFileWithDeepDirectory = {
+        def dummyTemplate = file('data/template.example')
+        def dummyOutFile = file('data/deep/directory/template')
+        makeDummyFile(dummyTemplate, dummyOutFile)
+        def isComplete = dummyOutFile.exists() && dummyTemplate.readBytes() == dummyOutFile.readBytes()
+        dummyOutFile.delete()
+        return isComplete
+    }()
+    assert doesMakeDummyFileWithDeepDirectory
+
+    def doesCatchFIleNotFoundException = {
+        try {
+            def dummyTemplate = file('data/asdfghjkl.example')
+            def dummyOutFile = file('data/template')
+            makeDummyFile(dummyTemplate, dummyOutFile)
+        } catch (FileNotFoundException e) {
+            return true
+        }
+        return false
+    }()
+    assert doesCatchFIleNotFoundException
+
+})
+
 check.dependsOn(task("writeResources") << {
     def resFile = tempFile("test.xml")
     writeResources(resFile, [foo: "aaa", bar: true, baz: 123])
