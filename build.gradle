@@ -159,11 +159,9 @@ ext.readVersion = { File file ->
 ext.setBuildConfigField = { def buildType, Map<Object, Object> buildConfigMap ->
     for (def entry in buildConfigMap) {
         if (entry.value instanceof String) {
-            buildType.buildConfigField \
-                    "${entry.value.getClass().getName()}", "${entry.key}","\"${entry.value}\""
+            buildType.buildConfigField "${entry.value.getClass().getName()}", "${entry.key}", "\"${entry.value}\""
         } else {
-            buildType.buildConfigField \
-                    "${entry.value.getClass().getName()}", "${entry.key}","${entry.value}"
+            buildType.buildConfigField "${entry.value.getClass().getName()}", "${entry.key}","${entry.value}"
         }
     }
 }
