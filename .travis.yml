@@ -7,6 +7,12 @@ before_install:
     - curl -L https://raw.github.com/embarkmobile/android-sdk-installer/master/android-sdk-installer | bash /dev/stdin --install=$COMPONENTS
     - source ~/.android-sdk-installer/env
     - export TERM=dumb # to get clean gradle output
+    # run emulator
+    - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
+    - emulator -avd test -no-skin -no-audio -no-window &
 install: ./gradlew
+before_script:
+    - wait_for_emulator
 script:
     - ./gradlew -b test/test.gradle check
+    - ./gradlew :test:project:connectedInstrumentTest
