@@ -10,9 +10,11 @@ NOTE: **This project is still alpha-qality; API will be change without notice**
 
 Converts the input icon file into grayscaled one.
 
-### `void copyFile(File inputFile, File outputFile)`
+### `void copyFile(File inputFile, File outputFile, boolean toOverwrite = false)`
 
 Create `outputFile` from `inputFile` if it does not exist.
+
+You can force overwrite with specifies the `true` to the 3rd argument.
 
 ### `void initSdkDir(Map<String, String> extra = null)`
 

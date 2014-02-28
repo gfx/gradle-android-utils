@@ -43,16 +43,49 @@ check.dependsOn(task("copyFile") << {
     assert doesCopyFileWithDeepDirectory
 
     def doesCatchFileNotFoundException = {
+        def caught = false
         try {
             def template = file('data/asdfghjkl.example')
             def outputFile = file('data/template')
             copyFile(template, outputFile)
         } catch (FileNotFoundException e) {
-            return true
+            caught = true
         }
-        return false
+        return caught
     }()
     assert doesCatchFileNotFoundException
+
+    { -> // test for overwrite with the 3rd argument.
+        def template = file('data/template.example')
+        def outputFile = file('data/template')
+        copyFile(template, outputFile)
+
+        def doesNotOverwrite = {
+            def anotherTemplate = file('data/template.example.2')
+            copyFile(anotherTemplate, outputFile)
+            def outputBytes = outputFile.readBytes();
+            return template.readBytes() == outputBytes && anotherTemplate.readBytes() != outputBytes
+        }()
+        assert doesNotOverwrite
+
+        def doesNotOverwriteSpecifiesFalse = {
+            def anotherTemplate = file('data/template.example.2')
+            copyFile(anotherTemplate, outputFile, false)
+            def outputBytes = outputFile.readBytes()
+            return template.readBytes() == outputBytes && anotherTemplate.readBytes() != outputBytes
+        }()
+        assert doesNotOverwriteSpecifiesFalse
+
+        def doesNotOverwriteSpecifiesTrue = {
+            def anotherTemplate = file('data/template.example.2')
+            copyFile(anotherTemplate, outputFile, true)
+            def outputBytes = outputFile.readBytes()
+            def wrote = template.readBytes() != outputBytes && anotherTemplate.readBytes() == outputBytes
+            outputFile.delete()
+            return wrote
+        }()
+        assert doesNotOverwriteSpecifiesTrue
+    }()
 
 })
 
