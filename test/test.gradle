@@ -21,38 +21,38 @@ check.dependsOn(task("initSdkDir") << {
     assert localPropFile.exists()
 })
 
-check.dependsOn(task("makeDummyFile") << {
-    def doesMakeDummyFile = {
-        def dummyTemplate = file('data/template.example')
-        def dummyOutFile = file('data/template')
-        makeDummyFile(dummyTemplate, dummyOutFile)
-        def isComplete = dummyOutFile.exists() && dummyTemplate.readBytes() == dummyOutFile.readBytes()
-        dummyOutFile.delete()
+check.dependsOn(task("copyFile") << {
+    def doesCopyFile = {
+        def template = file('data/template.example')
+        def outputFile = file('data/template')
+        copyFile(template, outputFile)
+        def isComplete = outputFile.exists() && template.readBytes() == outputFile.readBytes()
+        outputFile.delete()
         return isComplete
     }()
-    assert doesMakeDummyFile
+    assert doesCopyFile
 
-    def doesMakeDummyFileWithDeepDirectory = {
-        def dummyTemplate = file('data/template.example')
-        def dummyOutFile = file('data/deep/directory/template')
-        makeDummyFile(dummyTemplate, dummyOutFile)
-        def isComplete = dummyOutFile.exists() && dummyTemplate.readBytes() == dummyOutFile.readBytes()
-        dummyOutFile.delete()
+    def doesCopyFileWithDeepDirectory = {
+        def template = file('data/template.example')
+        def outputFile = file('data/deep/directory/template')
+        copyFile(template, outputFile)
+        def isComplete = outputFile.exists() && template.readBytes() == outputFile.readBytes()
+        outputFile.delete()
         return isComplete
     }()
-    assert doesMakeDummyFileWithDeepDirectory
+    assert doesCopyFileWithDeepDirectory
 
-    def doesCatchFIleNotFoundException = {
+    def doesCatchFileNotFoundException = {
         try {
-            def dummyTemplate = file('data/asdfghjkl.example')
-            def dummyOutFile = file('data/template')
-            makeDummyFile(dummyTemplate, dummyOutFile)
+            def template = file('data/asdfghjkl.example')
+            def outputFile = file('data/template')
+            copyFile(template, outputFile)
         } catch (FileNotFoundException e) {
             return true
         }
         return false
     }()
-    assert doesCatchFIleNotFoundException
+    assert doesCatchFileNotFoundException
 
 })
 
