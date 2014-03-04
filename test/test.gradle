@@ -21,6 +21,74 @@ check.dependsOn(task("initSdkDir") << {
     assert localPropFile.exists()
 })
 
+check.dependsOn(task("copyFile") << {
+    def doesCopyFile = {
+        def template = file('data/template.example')
+        def outputFile = file('data/template')
+        copyFile(template, outputFile)
+        def isComplete = outputFile.exists() && template.readBytes() == outputFile.readBytes()
+        outputFile.delete()
+        return isComplete
+    }()
+    assert doesCopyFile
+
+    def doesCopyFileWithDeepDirectory = {
+        def template = file('data/template.example')
+        def outputFile = file('data/deep/directory/template')
+        copyFile(template, outputFile)
+        def isComplete = outputFile.exists() && template.readBytes() == outputFile.readBytes()
+        outputFile.delete()
+        return isComplete
+    }()
+    assert doesCopyFileWithDeepDirectory
+
+    def doesCatchFileNotFoundException = {
+        def caught = false
+        try {
+            def template = file('data/asdfghjkl.example')
+            def outputFile = file('data/template')
+            copyFile(template, outputFile)
+        } catch (FileNotFoundException e) {
+            caught = true
+        }
+        return caught
+    }()
+    assert doesCatchFileNotFoundException
+
+    { -> // test for overwrite with the 3rd argument.
+        def template = file('data/template.example')
+        def outputFile = file('data/template')
+        copyFile(template, outputFile)
+
+        def doesNotOverwrite = {
+            def anotherTemplate = file('data/template.example.2')
+            copyFile(anotherTemplate, outputFile)
+            def outputBytes = outputFile.readBytes();
+            return template.readBytes() == outputBytes && anotherTemplate.readBytes() != outputBytes
+        }()
+        assert doesNotOverwrite
+
+        def doesNotOverwriteSpecifiesFalse = {
+            def anotherTemplate = file('data/template.example.2')
+            copyFile(anotherTemplate, outputFile, false)
+            def outputBytes = outputFile.readBytes()
+            return template.readBytes() == outputBytes && anotherTemplate.readBytes() != outputBytes
+        }()
+        assert doesNotOverwriteSpecifiesFalse
+
+        def doesNotOverwriteSpecifiesTrue = {
+            def anotherTemplate = file('data/template.example.2')
+            copyFile(anotherTemplate, outputFile, true)
+            def outputBytes = outputFile.readBytes()
+            def wrote = template.readBytes() != outputBytes && anotherTemplate.readBytes() == outputBytes
+            outputFile.delete()
+            return wrote
+        }()
+        assert doesNotOverwriteSpecifiesTrue
+    }()
+
+})
+
 check.dependsOn(task("writeResources") << {
     def resFile = tempFile("test.xml")
     writeResources(resFile, [foo: "aaa", bar: true, baz: 123])

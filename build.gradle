@@ -112,6 +112,20 @@ ext.writeResources = { File file, Map<String, Object> dict ->
 }
 
 /**
+ * Create `outputFile` from `inputFile` if it does not exist.
+ * You can force overwrite with specifies the `true` to the 3rd argument.
+ */
+ext.copyFile = { File inputFile, File outputFile, boolean toOverwrite = false ->
+    if (!inputFile.exists()) {
+        throw new FileNotFoundException("Template file does not exist: ${inputFile.getAbsolutePath()}")
+    }
+    outputFile.getParentFile().mkdirs()
+    if (toOverwrite || !outputFile.exists()) {
+        outputFile.bytes = inputFile.readBytes()
+    }
+}
+
+/**
  * Representation of Semantic Version (major.minor.patch-level)
  */
 public class Version {
