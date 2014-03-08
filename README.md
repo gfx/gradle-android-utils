@@ -36,7 +36,7 @@ Set `buildConfigField` from `Map`. Requirements to 'com.android.tools.build:grad
 ``` groovy
 // For example
 
-android.applicationVariants.all { variant ->
+android.variantFilter{ variant ->
     def buildConfigMap = [
         'APP_NAME': 'MyApp' + variant.buildType.name.capitalize(),
         'EXTENSION_MIN_SDK_INT': 14,
@@ -44,6 +44,8 @@ android.applicationVariants.all { variant ->
     ]
 
     setBuildConfigField(variant.buildType, buildConfigMap)
+    // or
+    //setBuildConfigField(variant.flavors.get(0), buildConfigMap)
 }
 
 /**
