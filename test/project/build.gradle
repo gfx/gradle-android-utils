@@ -23,13 +23,34 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    productFlavors {
+        production {
+
+        }
+
+        development {
+
+        }
+    }
 }
 
-def buildConfigMap = [
-        'FOO': "Foo",
-        'BAR': 123,
-        'BAZ': true,
-]
+// This test use `variantFilter`. `variantFilter` method for gradle-android-plugin v0.9.0 or later.
+// You can specifies buildType or flavor object to the fist argument.
+//
+// But don't provided `buildConfigField` in variant with `android-gradle-plugin` v0.9.0.
+// I'm looking forward to `gradle-android-plugin` fix :)
+android.variantFilter{ variant ->
+    def buildConfigMap = [
+            'FOO': "Foo",
+            'BAR': 123,
+            'BAZ': true,
+            'ENV_NAME_BUILD': "AppBuild-" + variant.buildType.name,
+    ]
+    def flavorConfigMap = [
+            'ENV_NAME_FLAVOR': "AppFlavor-" + variant.flavors.get(0).name,
+    ]
 
-setBuildConfigField(android.buildTypes.debug, buildConfigMap)
-
+    setBuildConfigField(variant.buildType, buildConfigMap)
+    setBuildConfigField(variant.flavors.get(0), flavorConfigMap)
+}

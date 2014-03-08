@@ -6,6 +6,8 @@ public class BuildConfigTest extends AndroidTestCase {
 
     public void testBuildConfigField() {
         assertEquals("Foo", BuildConfig.FOO);
+        assertEquals("AppBuild-" + BuildConfig.BUILD_TYPE, BuildConfig.ENV_NAME_BUILD);
+        assertEquals("AppFlavor-" + BuildConfig.FLAVOR, BuildConfig.ENV_NAME_FLAVOR);
         assertTrue(123 == BuildConfig.BAR);
         assertTrue(BuildConfig.BAZ);
     }
