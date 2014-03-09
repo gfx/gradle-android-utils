@@ -168,7 +168,9 @@ ext.readVersion = { File file ->
 }
 
 /**
- * Set buildConfigField from "Map" to buildType.
+ * Set buildConfigField from "Map" to buildType or productFlavors.
+ * You can specifies buildType or flavor object to the fist argument.
+ * But don't provided `buildConfigField` in variant with `android-gradle-plugin` v0.9.0.
  */
 ext.setBuildConfigField = { def buildType, Map<Object, Object> buildConfigMap ->
     for (def entry in buildConfigMap) {
