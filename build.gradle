@@ -1,4 +1,5 @@
 import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 
 private int toGray(color) {
     def a = (color & 0xFF000000)
@@ -15,16 +16,20 @@ ext.iconToGrayScale = { File inputFile, File outputFile ->
         return;
     }
 
-    def img = ImageIO.read(inputFile)
-    for (int y = 0; y < img.getHeight(); y++) {
-        for (int x = 0; x < img.getWidth(); x++) {
-            def color = img.getRGB(x, y)
-            img.setRGB(x, y, toGray(color))
+    def inputImage = ImageIO.read(inputFile)
+    def width = inputImage.getWidth()
+    def height = inputImage.getHeight()
+
+    def outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            def color = inputImage.getRGB(x, y)
+            outputImage.setRGB(x, y, toGray(color))
         }
     }
 
     outputFile.getParentFile().mkdirs()
-    ImageIO.write(img, "png", outputFile)
+    ImageIO.write(outputImage, "png", outputFile)
 }
 
 /**
