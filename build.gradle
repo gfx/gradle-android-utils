@@ -36,7 +36,7 @@ ext.iconToGrayScale = { File inputFile, File outputFile ->
  * Makes gray-scaled launcher icons for the "debug" build variant.
  */
 ext.makeGrayscaleLauncherIcon = { File dir, String name, List<String> buildTypes = ["debug"] ->
-    fileTree(dir: dir, include: "res/drawable*/$name").each { File ic ->
+    fileTree(dir: dir, includes: ["res/drawable*/$name", "res/mipmap*/$name"]).each { File ic ->
         buildTypes.each { String buildType ->
             String flavor = dir.getName();
             def outputFile = file(ic.getPath().replaceAll("/$flavor/", "/$buildType/"))
